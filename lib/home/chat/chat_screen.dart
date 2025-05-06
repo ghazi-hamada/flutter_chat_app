@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_chat_app/firebase/fire_storage.dart';
 import 'package:flutter_chat_app/home/chat/chat_cubit/chat_cubit.dart';
 import 'package:flutter_chat_app/home/chat/widgets/card_chat.dart';
 import 'package:flutter_chat_app/models/chat_user_model.dart';
@@ -123,7 +126,11 @@ class ChatScreen extends StatelessWidget {
                                   source: ImageSource.camera,
                                 );
                                 if (image != null) {
-                                  print(image.path);
+                                  FireStorage().uploadFile(
+                                    user.id!,
+                                    File(image.path),
+                                    roomId,
+                                  );
                                 }
                               },
                               icon: Icon(Iconsax.camera),

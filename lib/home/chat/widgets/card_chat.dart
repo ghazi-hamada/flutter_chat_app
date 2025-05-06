@@ -40,7 +40,13 @@ class CardChat extends StatelessWidget {
                 crossAxisAlignment:
                     isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  Text(messageModel.message.toString()),
+                  messageModel.type == 'text'
+                      ? Text(messageModel.message.toString())
+                      : Image.network(
+                        messageModel.message.toString(),
+                        height: 200,
+                        width: 200,
+                      ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
