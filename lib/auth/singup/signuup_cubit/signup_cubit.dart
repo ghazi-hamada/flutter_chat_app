@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_chat_app/firebase/fire_auth.dart';
 
 part 'signup_state.dart';
 
@@ -22,14 +23,7 @@ class SignupCubit extends Cubit<SignupState> {
             email: emailController.text,
             password: passwordController.text,
           );
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-            'name': nameController.text,
-            'email': emailController.text,
-            'uid': userCredential.user!.uid,
-          });
+      await FireAuth.createUser(name: nameController.text);
       emit(SignupSuccess());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

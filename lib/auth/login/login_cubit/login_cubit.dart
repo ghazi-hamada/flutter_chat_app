@@ -7,8 +7,17 @@ part 'login_state.dart';
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginInitial());
   TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  TextEditingController passwordController = TextEditingController();
+
+  bool isPasswordHidden = true;
+
+  void togglePasswordVisibility() {
+    emit(LoginLoading());
+    isPasswordHidden = !isPasswordHidden;
+    emit(LoginInitial()); // Emit a state to rebuild the UI
+  }
+
   void login() async {
     if (!formKey.currentState!.validate()) return;
     emit(LoginLoading());

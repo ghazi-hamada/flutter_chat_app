@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
- import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_chat_app/chat/chat_screen.dart';
-import 'package:flutter_chat_app/login/login_cubit/login_cubit.dart';
-import 'package:flutter_chat_app/login/login_screen.dart';
-import 'package:flutter_chat_app/singup/signuup_cubit/signup_cubit.dart';
-import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_chat_app/home/chat/chat_cubit/chat_cubit.dart';
+import 'package:flutter_chat_app/home/chat/chat_list_cubit/chat_list_cubit.dart';
+import 'package:flutter_chat_app/home/chat/chat_list_screen.dart';
+import 'package:flutter_chat_app/auth/forget_password/forget_password_cubit/forget_password_cubit.dart';
+import 'package:flutter_chat_app/home/contacts/contacts_cubit/contacts_cubit.dart';
+import 'package:flutter_chat_app/home/setting/setting_cubit/setting_cubit.dart';
+import 'package:flutter_chat_app/layout/layout_cubit/layout_cubit.dart';
+import 'package:flutter_chat_app/layout/layout_screen.dart';
+import 'package:flutter_chat_app/auth/login/login_cubit/login_cubit.dart';
+import 'package:flutter_chat_app/auth/login/login_screen.dart';
+import 'package:flutter_chat_app/auth/singup/signuup_cubit/signup_cubit.dart';
+import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:io';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );  runApp(const MyApp());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,22 +28,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-       providers: [
+      providers: [
         BlocProvider(create: (context) => LoginCubit()),
         BlocProvider(create: (context) => SignupCubit()),
+        BlocProvider(create: (context) => ForgetPasswordCubit()),
+        BlocProvider(create: (context) => ChatListCubit()),
+        BlocProvider(create: (context) => LayoutCubit()),
+        BlocProvider(create: (context) => ContactsCubit()),
+        BlocProvider(create: (context) => SettingCubit()),
+        BlocProvider(create: (context) => ChatCubit()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.dark,
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
+            seedColor: Colors.deepOrange,
             brightness: Brightness.dark,
           ),
         ),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
+            seedColor: Colors.lightBlue,
+
             brightness: Brightness.light,
           ),
         ),
@@ -49,59 +60,12 @@ class MyApp extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasData) {
-              return ChatScreen(); // Navigate to ChatScreen if logged in
+              return LayoutScreen(); // Navigate to ChatScreen if logged in
             } else {
               return LoginScreen(); // Navigate to LoginScreen if not logged in
             }
           },
         ),
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_chat_app/chat/chat_screen.dart';
-import 'package:flutter_chat_app/singup/signuup_cubit/signup_cubit.dart'; 
+import 'package:flutter_chat_app/home/chat/chat_list_screen.dart';
+import 'package:flutter_chat_app/auth/singup/signuup_cubit/signup_cubit.dart';
+import 'package:flutter_chat_app/layout/layout_screen.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 
 class RegistrationScreen extends StatelessWidget {
   const RegistrationScreen({super.key});
@@ -16,7 +19,7 @@ class RegistrationScreen extends StatelessWidget {
             // Navigate to the chat screen
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ChatScreen()),
+              MaterialPageRoute(builder: (context) => const LayoutScreen()),
             );
           }
         },
@@ -29,12 +32,16 @@ class RegistrationScreen extends StatelessWidget {
             child: Form(
               key: context.read<SignupCubit>().formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.chat_bubble_outline,
-                    size: 80,
-                    color: Colors.blue,
+                  SvgPicture.asset('assets/svg/logo.svg', height: 150),
+                  Text(
+                    'Welcome back',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
+                  Text(
+                    'Create an account to continue',
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 24),
                   TextFormField(
@@ -44,7 +51,7 @@ class RegistrationScreen extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      prefixIcon: const Icon(Icons.person),
+                      prefixIcon: const Icon(Iconsax.user),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -61,7 +68,7 @@ class RegistrationScreen extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      prefixIcon: const Icon(Icons.email),
+                      prefixIcon: const Icon(Iconsax.direct),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -81,7 +88,7 @@ class RegistrationScreen extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      prefixIcon: const Icon(Icons.lock),
+                      prefixIcon: const Icon(Iconsax.password_check),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -93,17 +100,20 @@ class RegistrationScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<SignupCubit>().signup();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<SignupCubit>().signup();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
+                      child: const Text('Register'),
                     ),
-                    child: const Text('Register'),
                   ),
                 ],
               ),
