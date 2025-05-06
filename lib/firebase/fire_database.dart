@@ -39,14 +39,14 @@ class FireDatabase {
     }
   }
 
-  sendMessage(String uid, String message, String roomId) async {
+  sendMessage(String uid, String message, String roomId,[String? type]) async {
     String messageId = DateTime.now().millisecondsSinceEpoch.toString();
     MessageModel messageModel = MessageModel(
       id: messageId,
       senderId: myUid,
       reciverId: uid,
       message: message,
-      type: 'text',
+      type: type ?? 'text',
       time: DateTime.now().millisecondsSinceEpoch.toString(),
       read: '',
     );
