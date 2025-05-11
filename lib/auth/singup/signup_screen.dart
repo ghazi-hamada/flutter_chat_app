@@ -17,10 +17,12 @@ class RegistrationScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is SignupSuccess) {
             // Navigate to the chat screen
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const LayoutScreen()),
-            );
+             Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LayoutScreen()),
+                    (route) => false,
+                  );
+            
           }
         },
         builder: (context, state) {

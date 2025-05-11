@@ -1,6 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_chat_app/firebase/fire_database.dart';
+import 'package:flutter_chat_app/home/chat/chat_screen.dart';
 import 'package:flutter_chat_app/home/contacts/contacts_cubit/contacts_cubit.dart';
+import 'package:flutter_chat_app/models/chat_user_model.dart';
 import 'package:iconsax/iconsax.dart';
 
 class ContactsScreen extends StatelessWidget {
@@ -8,11 +14,16 @@ class ContactsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ContactsCubit, ContactsState>(
+    return BlocConsumer<ContactsCubit, ContactsState>(
+      listener: (context, state) {
+        if (state is ContactsCreated) {
+          Navigator.pop(context);
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           floatingActionButton: FloatingActionButton(
-            child: const Icon(Iconsax.message_add),
+            child: const Icon(Iconsax.user_add),
             onPressed: () {
               showBottomSheet(
                 context: context,
@@ -33,18 +44,27 @@ class ContactsScreen extends StatelessWidget {
                             ],
                           ),
                           SizedBox(height: 20),
-                          TextFormField(
-                            controller: TextEditingController(),
-                            decoration: InputDecoration(
-                              labelText: 'Email',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          Form(
+                            key: context.read<ContactsCubit>().formKey,
+                            child: TextFormField(
+                              controller:
+                                  context.read<ContactsCubit>().emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                prefixIcon: const Icon(Iconsax.direct),
                               ),
-                              prefixIcon: const Icon(Iconsax.direct),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Enter an email';
+                                } else if (value ==
+                                    FirebaseAuth.instance.currentUser!.email)
+                                  return 'You can not add yourself';
+                                return null;
+                              },
                             ),
-                            validator:
-                                (value) =>
-                                    value!.isEmpty ? 'Enter an email' : null,
                           ),
 
                           SizedBox(height: 20),
@@ -60,7 +80,7 @@ class ContactsScreen extends StatelessWidget {
                             ),
                             child: const Text('create chat'),
                             onPressed: () {
-                              // context.read<ChatListCubit>().sendInvitation();
+                              context.read<ContactsCubit>().createContacts();
                             },
                           ),
                         ],
@@ -74,6 +94,9 @@ class ContactsScreen extends StatelessWidget {
                 context.read<ContactsCubit>().isSearch
                     ? TextField(
                       autofocus: true,
+                      onChanged: (value) {
+                        context.read<ContactsCubit>().whenSearching();
+                      },
                       controller:
                           context.read<ContactsCubit>().searchController,
                       decoration: InputDecoration(
@@ -103,16 +126,51 @@ class ContactsScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 10),
               Expanded(
-                child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: const ListTile(
-                        leading: CircleAvatar(),
-                        title: Text('User Name'),
-                        subtitle: Text('User Email'),
-                        trailing: Icon(Iconsax.message),
-                      ),
+                child: StreamBuilder(
+                  stream:
+                      FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final myContacts = snapshot.data!.data()!['my_contacts'];
+                    return StreamBuilder(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .where('id', whereIn: myContacts)
+                              .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        List<ChatUser> users =
+                            snapshot.data!.docs
+                                .map((e) => ChatUser.fromJson(e.data()))
+                                .where(
+                                  (e) => e.name!.toLowerCase().startsWith(
+                                    context
+                                        .read<ContactsCubit>()
+                                        .searchController
+                                        .text
+                                        .toLowerCase(),
+                                  ),
+                                )
+                                .toList()
+                              ..sort((e1, e2) => e1.name!.compareTo(e2.name!));
+                        return ListView.builder(
+                          itemCount: users.length,
+                          itemBuilder: (context, index) {
+                            return ContactCard(users: users[index]);
+                          },
+                        );
+                      },
                     );
                   },
                 ),
@@ -121,6 +179,44 @@ class ContactsScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class ContactCard extends StatelessWidget {
+  const ContactCard({super.key, required this.users});
+
+  final ChatUser users;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: CachedNetworkImageProvider(users.image.toString()),
+        ),
+        title: Text(users.name!),
+        subtitle: Text(users.email!),
+        trailing: IconButton(
+          onPressed: () {
+            List<String> usersId = [
+              users.id!,
+              FirebaseAuth.instance.currentUser!.uid,
+            ]..sort((e1, e2) => e1.compareTo(e2));
+            FireDatabase().createRoom(email: users.email!).then((value) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) =>
+                          ChatScreen(roomId: usersId.toString(), user: users),
+                ),
+              );
+            });
+          },
+          icon: Icon(Iconsax.message),
+        ),
+      ),
     );
   }
 }

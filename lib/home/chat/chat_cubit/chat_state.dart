@@ -8,3 +8,5 @@ abstract class ChatState extends Equatable {
 }
 
 class ChatInitial extends ChatState {}
+
+class ChatLoading extends ChatState {}

@@ -19,9 +19,10 @@ class LoginScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is LoginSuccess) {
             // Navigate to the chat screen
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const LayoutScreen()),
+              (route) => false,
             );
           } else if (state is LoginFailure) {
             ScaffoldMessenger.of(

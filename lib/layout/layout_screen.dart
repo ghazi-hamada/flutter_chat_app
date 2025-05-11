@@ -7,9 +7,14 @@ import 'package:flutter_chat_app/home/setting/setting_screen.dart';
 import 'package:flutter_chat_app/layout/layout_cubit/layout_cubit.dart';
 import 'package:iconsax/iconsax.dart';
 
-class LayoutScreen extends StatelessWidget {
+class LayoutScreen extends StatefulWidget {
   const LayoutScreen({super.key});
 
+  @override
+  State<LayoutScreen> createState() => _LayoutScreenState();
+}
+
+class _LayoutScreenState extends State<LayoutScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> screens = [
@@ -18,16 +23,18 @@ class LayoutScreen extends StatelessWidget {
       ContactsScreen(),
       SettingScreen(),
     ];
+
     return BlocBuilder<LayoutCubit, LayoutState>(
       builder: (context, state) {
+        final layoutCubit = context.read<LayoutCubit>();
+
         return Scaffold(
-          body: screens[context.read<LayoutCubit>().curuntIndex],
-        
+          body: screens[layoutCubit.curuntIndex],
+
           bottomNavigationBar: NavigationBar(
-            selectedIndex: context.read<LayoutCubit>().curuntIndex,
-            onDestinationSelected:
-                (value) => context.read<LayoutCubit>().changeIndex(value),
-            destinations: [
+            selectedIndex: layoutCubit.curuntIndex,
+            onDestinationSelected: (value) => layoutCubit.changeIndex(value),
+            destinations: const [
               NavigationDestination(icon: Icon(Iconsax.message), label: 'Chat'),
               NavigationDestination(
                 icon: Icon(Iconsax.messages),

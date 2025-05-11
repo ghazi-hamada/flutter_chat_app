@@ -6,12 +6,9 @@ import 'package:path/path.dart';
 
 class FireStorage {
   /// يرفع ملف ويرجع رابط الصورة اللي رجعه السيرفر
-  Future<String?> uploadFile(String uid, File file, String roomId) async {
+  Future<String?> uploadFile( File file) async {
     try {
       final uri = Uri.parse(
-
-
-
         'https://ghaziapp.store/zenat_app_backend/upload_image.php',
       );
 
@@ -36,7 +33,7 @@ class FireStorage {
             responseData['image'] != null) {
           String imageUrl = responseData['image'];
           print('تم رفع الصورة بنجاح: $imageUrl');
-          FireDatabase().sendMessage(uid, imageUrl, roomId, 'image');
+          
           return imageUrl;
         } else {
           print(

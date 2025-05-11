@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -35,7 +37,7 @@ class QrCodeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   QrImageView(
-                    data: '1234567890',
+                    data: FirebaseAuth.instance.currentUser!.uid,
                     version: QrVersions.auto,
                     size: 200.0,
                     eyeStyle: QrEyeStyle(
@@ -54,9 +56,7 @@ class QrCodeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      
-                    },
+                    onPressed: () {},
                     icon: const Icon(Icons.share),
                     label: const Text('مشاركة الرمز'),
                     style: ElevatedButton.styleFrom(

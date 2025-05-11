@@ -17,9 +17,24 @@ class FireAuth {
       pushToken: '',
       abuot: '',
       online: true,
+      myContacts: [],
     );
 
     user?.updateDisplayName(name);
     await firestore.collection('users').doc(user!.uid).set(chatUser.toJson());
+  }
+
+  Future<void> getToken(String token) async {
+    await firestore.collection('users').doc(user!.uid).update({
+      'push_token': token,
+    });
+  }
+
+  Future updateActivatedTime(bool online) async {
+    print('User is ${online ? 'ONLINE' : 'OFFLINE'}');
+    await firestore.collection('users').doc(user!.uid).update({
+      'online': online,
+      'last_activated': DateTime.now().millisecondsSinceEpoch.toString(),
+    });
   }
 }

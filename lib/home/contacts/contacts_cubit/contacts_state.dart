@@ -20,3 +20,5 @@ class ContactsFailure extends ContactsState {
   final String message;
   const ContactsFailure(this.message);
 }
+class ContactsCreated extends ContactsState {}
+
