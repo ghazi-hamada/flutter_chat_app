@@ -11,7 +11,7 @@ void onUserLogin() {
      appID: 1673848169, // Fill in the appID that you get from ZEGOCLOUD Admin Console.
       appSign: '90b8ef8262a004e6f21e3898acb54cbf52d8d6789e420b7f7c3ba13de7d71570', // Fill in the appSign that you get from ZEGOCLOUD Admin Console.
     userID: FirebaseAuth.instance.currentUser!.uid,
-    userName: FirebaseAuth.instance.currentUser!.displayName!,
+    userName: FirebaseAuth.instance.currentUser!.displayName ?? "Unknown User",
     plugins: [ZegoUIKitSignalingPlugin()],
   );
 }

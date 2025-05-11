@@ -1,32 +1,4 @@
-name: flutter_chat_app
-description: "A new Flutter project."
-
-
-publish_to: 'none' 
-
-
-
-
-
-
-
-
-
-
-
-
-
-version: 1.0.0+1
-
-environment:
-  sdk: ^3.7.2
-
-
-
-
-
-
-
+---
 dependencies:
   cached_network_image: ^3.2.3
   cloud_firestore: ^5.6.7
@@ -51,47 +23,20 @@ dependencies:
   qr_flutter: ^4.1.0
   shared_preferences: ^2.5.3
   timeago: ^3.2.2
+  zego_uikit: ^2.28.14
   zego_uikit_prebuilt_call: ^4.16.28
   zego_uikit_signaling_plugin: ^2.8.12
-
+description: A new Flutter project.
 dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-
-
-
-
+environment:
+  sdk: ^3.7.2
 flutter:
-
-  
-  
-  
-  uses-material-design: true
-  
   assets:
     - assets/svg/
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  uses-material-design: true
+name: flutter_chat_app
+publish_to: none
+version: 1.0.0+1

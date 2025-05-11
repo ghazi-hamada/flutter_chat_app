@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_chat_app/core/services/call_services.dart';
 import 'package:flutter_chat_app/core/services/fcm_services.dart';
 import 'package:flutter_chat_app/firebase/fire_auth.dart';
 import 'package:flutter_chat_app/home/chat/chat_cubit/chat_cubit.dart';
@@ -24,24 +25,24 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   /// 1.1.2: set navigator key to ZegoUIKitPrebuiltCallInvitationService
   ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
 
   // call the useSystemCallingUI
   ZegoUIKit().initLog().then((value) {
-    ZegoUIKitPrebuiltCallInvitationService().useSystemCallingUI(
-      [ZegoUIKitSignalingPlugin()],
-    );
+    ZegoUIKitPrebuiltCallInvitationService().useSystemCallingUI([
+      ZegoUIKitSignalingPlugin(),
+    ]);
   });
   runApp(const MyApp());
-   
 }
 
 class MyApp extends StatelessWidget {
@@ -84,17 +85,17 @@ class MyApp extends StatelessWidget {
                   colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
                   useMaterial3: true,
                 ),
-                
+
                 home: StreamBuilder<User?>(
                   stream: FirebaseAuth.instance.authStateChanges(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasData) {
-                       if (FireAuth.user != null) {
-      FireAuth().updateActivatedTime(false);
-  }
-                        FcmService.init();
+                      if (FireAuth.user != null) {
+                        CallServices().onUserLogin();
+                      }
+                      FcmService.init();
                       return LayoutScreen(); // Navigate to ChatScreen if logged in
                     } else {
                       return LoginScreen(); // Navigate to LoginScreen if not logged in

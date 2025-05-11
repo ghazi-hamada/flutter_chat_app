@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,6 +31,10 @@ class ChatScreen extends StatelessWidget {
         // TODO: implement listener
       },
       builder: (context, state) {
+        final bool isSelectMode =
+            context.read<ChatCubit>().messagesIdSelected.isNotEmpty ||
+            context.read<ChatCubit>().messagesTextSelected.isNotEmpty;
+
         return Scaffold(
           appBar: AppBar(
             centerTitle: false,
@@ -45,7 +50,6 @@ class ChatScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(user.name.toString()),
-
                     Text(
                       user.online!
                           ? 'Online'
@@ -57,26 +61,40 @@ class ChatScreen extends StatelessWidget {
               ],
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Iconsax.call),
-                onPressed: () {
-                  // Call user
-                },
-              ),
-              IconButton(
-                icon: const Icon(Iconsax.video),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CallPage(callID: roomId),
-                    ),
-                  );
-                },
-              ),
-              context.read<ChatCubit>().messagesTextSelected.isEmpty
-                  ? SizedBox()
-                  : IconButton(
+              // Show call buttons only when not in selection mode
+              // if (!isSelectMode) ...[
+              //   // Voice call button
+              //   ZegoSendCallInvitationButton(
+              //     buttonSize: const Size(20, 20),
+              //     invitees: [
+              //       ZegoUIKitUser(
+              //         id: user.id.toString(),
+              //         name: user.name.toString(),
+              //       ),
+              //     ],
+              //     isVideoCall: false, // Audio call
+              //     resourceID: 'chatApp',
+              //     icon:   ButtonIcon(icon: Icon(Iconsax.call), backgroundColor: Colors.transparent),
+              //   ),
+              //   // Video call button
+              //   ZegoSendCallInvitationButton(
+              //     buttonSize: const Size(20, 20),
+              //     invitees: [
+              //       ZegoUIKitUser(
+              //         id: user.id.toString(),
+              //         name: user.name.toString(),
+              //       ),
+              //     ],
+              //     isVideoCall: true, // Video call
+              //     resourceID: 'chatApp',
+              //     icon:   ButtonIcon( icon:Icon(Iconsax.video), backgroundColor: Colors.transparent),
+              //   ),
+              // ],
+              // Show copy and delete buttons when in selection mode
+              if (isSelectMode) ...[
+                // Copy button
+                if (context.read<ChatCubit>().messagesTextSelected.isNotEmpty)
+                  IconButton(
                     icon: const Icon(Iconsax.copy),
                     onPressed: () {
                       Clipboard.setData(
@@ -90,16 +108,15 @@ class ChatScreen extends StatelessWidget {
                       context.read<ChatCubit>().clean();
                     },
                   ),
-
-              context.read<ChatCubit>().messagesIdSelected.isEmpty
-                  ? SizedBox()
-                  : IconButton(
+                // Delete button
+                if (context.read<ChatCubit>().messagesIdSelected.isNotEmpty)
+                  IconButton(
                     icon: const Icon(Iconsax.trash),
                     onPressed: () {
                       context.read<ChatCubit>().deleteMessage(roomId);
                     },
                   ),
-              // IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+              ],
             ],
           ),
           body: Padding(
@@ -124,7 +141,7 @@ class ChatScreen extends StatelessWidget {
                               children: [
                                 IconButton(
                                   onPressed: () {},
-                                  icon: Icon(Iconsax.emoji_happy),
+                                  icon: const Icon(Iconsax.emoji_happy),
                                 ),
                                 IconButton(
                                   onPressed: () async {
@@ -140,25 +157,45 @@ class ChatScreen extends StatelessWidget {
                                       );
                                     }
                                   },
-                                  icon: Icon(Iconsax.camera),
+                                  icon: const Icon(Iconsax.camera),
                                 ),
                               ],
                             ),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 10,
                             ),
                             hintText: 'Type a message',
                           ),
+                          onTap: () {
+                            // Clear selection when starting to type
+                            if (isSelectMode) {
+                              context.read<ChatCubit>().clean();
+                            }
+                          },
                         ),
                       ),
                     ),
-                    IconButton.filled(
-                      icon: const Icon(Iconsax.send_1),
-                      onPressed: () {
-                        context.read<ChatCubit>().sendMessage(user, roomId);
-                      },
+                    // IconButton.filled(
+                    //   icon: const Icon(Iconsax.send_1),
+                    //   onPressed: () {
+                    //     context.read<ChatCubit>().sendMessage(user, roomId);
+                    //   },
+                    // ),
+                    ZegoSendCallInvitationButton(
+                      invitees: [
+                        ZegoUIKitUser(
+                          id: user.id.toString(),
+                          name: user.name.toString(),
+                        ),
+                      ],
+                      isVideoCall: true, // Video call
+                      resourceID: 'chatApp',
+                      icon: ButtonIcon(
+                        icon: Icon(Iconsax.video),
+                        backgroundColor: Colors.transparent,
+                      ),
                     ),
                   ],
                 ),
